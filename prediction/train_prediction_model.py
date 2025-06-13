@@ -1,0 +1,28 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from joblib import dump
+import random
+
+
+def is_risky(email, amount):
+    return email.endswith("tempmail.com") or amount > 5000
+
+
+data = []
+for _ in range(1000):
+    amount = random.uniform(10, 10000)
+    email = random.choice(["user@gmail.com", "fraud@tempmail.com", "legit@yahoo.com"])
+    label = int(is_risky(email, amount))
+    data.append((amount, int(email.endswith("tempmail.com")), label))
+
+df = pd.DataFrame(data, columns=["amount", "is_temp_email", "risk"])
+
+X = df[["amount", "is_temp_email"]]
+y = df["risk"]
+
+model = RandomForestClassifier()
+model.fit(X, y)
+
+dump(model, "risk_predictor.joblib")
+print("model successfully trained")
